@@ -1,17 +1,30 @@
-###These scripts will take a list of filename/prefixes and drop the foreground taxa from the fasta, then re-write the tree file to match it
+#  Drop-Test Pipeline for Selection Analysis
 
-##STEP1 This script will copy a list of fasta files (or prefixes) to a new directory
-##These should be the genes that are P<0.05 for BUSTED and/or RELAX (intensified selection or relaxed selection) 
+Automated pipeline for testing **robustness in gene-level selection analyses** by dropping one or more foreground taxa from FASTA alignments, pruning corresponding phylogenetic trees, and re-running **HyPhy** (BUSTED or RELAX models).  
+
+This workflow validates whether signals of **intensified or relaxed selection** remain significant after removing SPECIES OF INTEREST — providing a quantitative check on how much statistical signal is derived from PERVASIVE selection across the tree vs selection predicted in your foreground taxa. Interpretation: A negatige result indicates selection is not pervasive across the tree when focal species are removed (which indicates a robust *real* signal of selection in focal species. 
+
+---
+
+<details>
+<summary>🧭 <b>Pipeline Overview</b></summary>
+
+| Step | Purpose | Input | Output |
+|------|----------|--------|---------|
+| **1. File Selection** | Copy selected FASTA files into a working directory. | `DropTestGenes.txt` (list of target genes) | New directory with genes flagged as P < 0.05 by BUSTED/RELAX |
+| **2. Foreground Drop** | Remove specified taxa from alignments. | FASTA + taxa list | Cleaned FASTAs in new subdirectory |
+| **3. Tree Pruning** | Rewrite tree files to match dropped FASTAs. | Master tree + taxa list | Pruned trees matching new alignments |
+| **4. Re-analysis** | Run **HyPhy BUSTED (HF)** on FASTA/tree pairs. | Updated FASTA + tree files | Refined selection-model results |
+
+</details>
+
+---
+
+<details>
+<summary>⚙️ <b>Step-by-Step Instructions</b></summary>
+
+### **STEP 1 – Select and Copy Input Files**
+
+```bash
 GetFiles.sh
-DropTestGenes.txt #List of genes to do drop tests for 
-
-##STEP 2 Drop the forground species from your fasta files and re-write them to a new subdir
-DropSpecies_fastafiles.sh
-DropSpecies_fastafiles.py
-
-##STEP 3 re-write tree files to match new fasta files --- note you need a master tree file that this script can  prune from
-writeTrees.py
-WriteTrees.sh
-
-#STEP3 run HF BUSTED on the all of the dropped fasta/tre file pairs 
-dropBUSTED_HF.sh
+DropTestGenes.txt
